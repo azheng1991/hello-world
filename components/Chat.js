@@ -45,6 +45,14 @@ export default class HelloChat extends React.Component {
     }));
   }
 
+  //pulling in information from Start.js name/color
+  static navigationOptions = ({ navigation }) => {
+    return {
+      name: navigation.state.params.name,
+      color: navigation.state.params.color,
+    };
+  };
+
   renderBubble(props) {
     return (
       <Bubble
@@ -59,8 +67,19 @@ export default class HelloChat extends React.Component {
   }
 
   render() {
+    //store the background color to use
+    let color = this.props.route.params.color;
+
+    //store the title to use
+    let name = this.props.route.params.name;
+
     return (
-      <View style={{ flex: 1 }}>
+      <View
+        style={{
+          backgroundColor: color,
+          flex: 1,
+        }}
+      >
         <GiftedChat
           renderBubble={this.renderBubble}
           messages={this.state.messages}
