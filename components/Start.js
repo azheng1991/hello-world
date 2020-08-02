@@ -39,7 +39,7 @@ export default class Start extends React.Component {
               style={[styles.colorButton, styles.color1]}
             />
             <TouchableOpacity
-              onPress={() => this.setState({ color: "#474056" })}
+              onPress={() => this.setState({ color: "purple" })}
               style={[styles.colorButton, styles.color2]}
             />
             <TouchableOpacity

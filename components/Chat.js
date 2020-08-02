@@ -1,27 +1,74 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import {
+  View,
+  Platform,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Text,
+} from "react-native";
 
-export default class Chat extends React.Component {
-  render() {
-    //store the background color to use
-    let color = this.props.route.params.color;
+export default class HelloChat extends React.Component {
+  state = {
+    messages: [],
+  };
 
-    //store the title to use
-    let name = this.props.route.params.name;
+  componentDidMount() {
+    this.setState({
+      messages: [
+        {
+          _id: 1,
+          text: "Hello developer",
+          createdAt: new Date(),
+          user: {
+            _id: 2,
+            name: "React Native",
+            avatar: "https://placeimg.com/140/140/any",
+          },
+        },
+        {
+          _id: 2,
+          text: "This is a system message",
+          createdAt: new Date(),
+          system: true,
+        },
+      ],
+    });
+  }
 
-    //sets the title
-    this.props.navigation.setOptions({ title: name });
+  onSend(messages = []) {
+    this.setState((previousState) => ({
+      messages: GiftedChat.append(previousState.messages, messages),
+    }));
+  }
 
+  renderBubble(props) {
     return (
-      <View
-        style={{
-          backgroundColor: color,
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: "#000",
+          },
         }}
-      >
-        <Text style={{ color: "green" }}>What's Up!</Text>
+      />
+    );
+  }
+
+  render() {
+    return (
+      <View style={{ flex: 1 }}>
+        <GiftedChat
+          renderBubble={this.renderBubble}
+          messages={this.state.messages}
+          onSend={(messages) => this.onSend(messages)}
+          user={{
+            _id: 1,
+          }}
+        />
       </View>
     );
   }
