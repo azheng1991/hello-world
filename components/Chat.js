@@ -24,6 +24,7 @@ export default class Chat extends Component {
     // connect to firestore
     if (!firebase.apps.length) {
       firebase.initializeApp({
+<<<<<<< HEAD
         apiKey: "AIzaSyAmKB0gRWp2h2T97NBgaVaPN19Q9gxuZaA",
         authDomain: "react-native-chat-app-rohit.firebaseapp.com",
         databaseURL: "https://react-native-chat-app-rohit.firebaseio.com",
@@ -36,6 +37,20 @@ export default class Chat extends Component {
     }
     // reference to messages collection
     this.referenceMessages = firebase.firestore().collection("messages");
+=======
+        apiKey: "AIzaSyCZbd3DNWaDHvZx5C8fdLCNLGFQCpdjEHE",
+        authDomain: "hello-world-bf027.firebaseapp.com",
+        databaseURL: "https://hello-world-bf027.firebaseio.com",
+        projectId: "hello-world-bf027",
+        storageBucket: "hello-world-bf027.appspot.com",
+        messagingSenderId: "966926622384",
+        appId: "1:966926622384:web:426f7aa6f2c0a8a03d2575",
+        measurementId: "G-CE5CLS0MY0",
+      });
+    }
+    // reference to messages collection
+    this.referenceMessages = firebase.firestore().collection("Users");
+>>>>>>> 380f5f089be688c548284c0f466b06c427625475
   }
 
   //authenticates the user, sets the state to sned messages and gets past messages
