@@ -1,92 +1,144 @@
-import React from "react";
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
-import {
-  View,
-  Platform,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Text,
-} from "react-native";
+import React, { Component } from "react";
+import { View, StyleSheet, Text } from "react-native";
 
-export default class HelloChat extends React.Component {
-  state = {
-    messages: [],
-  };
+import { GiftedChat } from "react-native-gifted-chat";
+import { color } from "react-native-reanimated";
 
+// import firestore/firebase
+const firebase = require("firebase");
+require("firebase/firestore");
+
+export default class Chat extends Component {
+  constructor() {
+    super();
+    this.state = {
+      messages: [],
+      user: {
+        _id: "",
+        name: "",
+        avatar: "",
+      },
+      loggedInText: "",
+    };
+
+    // connect to firestore
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyCZbd3DNWaDHvZx5C8fdLCNLGFQCpdjEHE",
+        authDomain: "hello-world-bf027.firebaseapp.com",
+        databaseURL: "https://hello-world-bf027.firebaseio.com",
+        projectId: "hello-world-bf027",
+        storageBucket: "hello-world-bf027.appspot.com",
+        messagingSenderId: "966926622384",
+        appId: "1:966926622384:web:426f7aa6f2c0a8a03d2575",
+        measurementId: "G-CE5CLS0MY0",
+      });
+    }
+    // reference to messages collection
+    this.referenceMessages = firebase.firestore().collection("Users");
+  }
+
+  //authenticates the user, sets the state to sned messages and gets past messages
   componentDidMount() {
-    this.setState({
-      messages: [
-        {
-          _id: 1,
-          text: "Hello developer",
-          createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: "React Native",
-            avatar: "https://placeimg.com/140/140/any",
-          },
+    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        try {
+          await firebase.auth().signInAnonymously();
+        } catch (error) {
+          console.log(`Unable to sign in: ${error.message}`);
+        }
+      }
+      this.setState({
+        user: {
+          _id: user.uid,
+          name: this.props.route.params.name,
+          avatar: "https://placeimg.com/140/140/any",
         },
-        {
-          _id: 2,
-          text: "This is a system message",
-          createdAt: new Date(),
-          system: true,
-        },
-      ],
+        loggedInText: `${this.props.route.params.name} has entered the chat`,
+        messages: [],
+      });
+      this.unsubscribe = this.referenceMessages
+        .orderBy("createdAt", "desc")
+        .onSnapshot(this.onCollectionUpdate);
     });
   }
 
-  onSend(messages = []) {
-    this.setState((previousState) => ({
-      messages: GiftedChat.append(previousState.messages, messages),
-    }));
+  componentWillUnmount() {
+    this.authUnsubscribe();
+    this.unsubscribe();
   }
 
-  //pulling in information from Start.js name/color
-  static navigationOptions = ({ navigation }) => {
-    return {
-      name: navigation.state.params.name,
-      color: navigation.state.params.color,
-    };
-  };
-
-  renderBubble(props) {
-    return (
-      <Bubble
-        {...props}
-        wrapperStyle={{
-          right: {
-            backgroundColor: "#000",
-          },
-        }}
-      />
+  //Function to sned messages
+  onSend(messages = []) {
+    this.setState(
+      (previousState) => ({
+        messages: GiftedChat.append(previousState.messages, messages),
+      }),
+      () => {
+        this.addMessages();
+      }
     );
   }
 
-  render() {
-    //store the background color to use
-    let color = this.props.route.params.color;
+  //Updates the messages in the state from Firestore when called
+  onCollectionUpdate = (querySnapshot) => {
+    const messages = [];
+    // loop through documents
+    querySnapshot.forEach((doc) => {
+      // get data snapshot
+      const data = doc.data();
+      messages.push({
+        _id: data._id,
+        text: data.text.toString(),
+        createdAt: data.createdAt.toDate(),
+        user: {
+          _id: data.user._id,
+          name: data.user.name,
+          avatar: data.user.avatar,
+        },
+      });
+    });
+    this.setState({
+      messages,
+    });
+  };
 
-    //store the title to use
+  //Pushes messages to Firestore database
+  addMessages = () => {
+    const message = this.state.messages[0];
+    this.referenceMessages.add({
+      _id: message._id,
+      text: message.text || "",
+      createdAt: message.createdAt,
+      user: message.user,
+      sent: true,
+    });
+  };
+
+  render() {
+    //Get seleceted background color
+    let bcolor = this.props.route.params.color;
+
+    //Get selected user name
     let name = this.props.route.params.name;
+
+    //Set title to usernam
+    this.props.navigation.setOptions({ title: name });
 
     return (
       <View
         style={{
-          backgroundColor: color,
           flex: 1,
+          //Set background color to selected
+          backgroundColor: bcolor,
         }}
       >
+        <Text>{this.state.loggedInText}</Text>
+
         <GiftedChat
-          renderBubble={this.renderBubble}
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
-          user={{
-            _id: 1,
-          }}
+          user={this.state.user}
         />
       </View>
     );

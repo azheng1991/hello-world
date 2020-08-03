@@ -8,7 +8,7 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from "react-native";
-const image = "/components/Background.png";
+//const image = "/assets/Background.png";
 
 export default class Start extends React.Component {
   constructor() {
@@ -18,10 +18,10 @@ export default class Start extends React.Component {
   render() {
     return (
       <ImageBackground
-        source={require("./BackgroundImage.png")}
+        source={require("../assets/Background.png")}
         style={styles.backgroundImage}
       >
-        <Text style={styles.titleText}>MyChat</Text>
+        <Text style={styles.titleText}>My Chat App</Text>
         <View style={styles.textContainer}>
           <TextInput
             style={styles.nameText}
@@ -39,7 +39,7 @@ export default class Start extends React.Component {
               style={[styles.colorButton, styles.color1]}
             />
             <TouchableOpacity
-              onPress={() => this.setState({ color: "purple" })}
+              onPress={() => this.setState({ color: "#474056" })}
               style={[styles.colorButton, styles.color2]}
             />
             <TouchableOpacity
@@ -73,11 +73,10 @@ export default class Start extends React.Component {
 
 const styles = StyleSheet.create({
   backgroundImage: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
     flex: 1,
+    resizeMode: "cover",
+    justifyContent: "space-evenly",
+    alignItems: "center",
   },
   textContainer: {
     width: "88%",
@@ -89,9 +88,11 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontSize: 45,
+    marginTop: 150,
+    marginBottom: 150,
     fontWeight: "600",
-    color: "#FFFFFF",
-    marginBottom: 100,
+    color: "#ffffff",
+    textAlign: "center",
   },
   nameText: {
     height: 70,
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     color: "#757083",
     opacity: 0.5,
-    textAlign: "center",
+    textAlign: "left",
     borderColor: "grey",
     borderWidth: 2,
     padding: 20,
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#090C08",
   },
   color2: {
-    backgroundColor: "purple",
+    backgroundColor: "#474056",
   },
   color3: {
     backgroundColor: "#8A95A5",
